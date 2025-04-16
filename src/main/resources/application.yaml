@@ -1,0 +1,11 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /yolohome
+
+spring:
+  application:
+    name: yolohome-service
+  data:
+    mongodb:
+      uri: mongodb://root:root@localhost:27018/yolohome?authSource=admin

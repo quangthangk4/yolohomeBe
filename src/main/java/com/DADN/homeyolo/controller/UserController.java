@@ -2,6 +2,7 @@ package com.DADN.homeyolo.controller;
 
 import com.DADN.homeyolo.dto.ApiResponse;
 import com.DADN.homeyolo.dto.request.UserCreationRequest;
+import com.DADN.homeyolo.dto.request.UserLoginRequest;
 import com.DADN.homeyolo.dto.response.UserResponse;
 import com.DADN.homeyolo.service.UserService;
 import jakarta.validation.Valid;
@@ -24,5 +25,10 @@ public class UserController {
                 .build();
     }
 
-
+    @PostMapping("/login")
+    public ApiResponse<Boolean> login(@RequestBody UserLoginRequest request) {
+        return ApiResponse.<Boolean>builder()
+                .result(userService.login(request))
+                .build();
+    }
 }

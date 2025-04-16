@@ -7,7 +7,7 @@ import com.DADN.homeyolo.entity.User;
 import com.DADN.homeyolo.exception.AppException;
 import com.DADN.homeyolo.exception.ErrorCode;
 import com.DADN.homeyolo.mapper.UserMapper;
-import com.DADN.homeyolo.repository.httpClient.UserRepository;
+import com.DADN.homeyolo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

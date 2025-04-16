@@ -9,3 +9,15 @@ spring:
   data:
     mongodb:
       uri: mongodb://root:root@localhost:27018/yolohome?authSource=admin
+
+
+app:
+  adafruit:
+    username: quangthanga123
+    active_key: aio_jvQb53ZPivJuaGMfR4Ou1uk0pEXv
+
+logging:
+  level:
+    comyourpackage.AdafruitDataScheduler: DEBUG # Thay com.yourpackage bằng package thực tế của bạn
+    org.springframework.web.reactive.function.client: TRACE # Để xem chi tiết request/response của WebClient
+

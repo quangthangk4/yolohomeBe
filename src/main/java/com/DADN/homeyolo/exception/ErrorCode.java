@@ -18,6 +18,9 @@ public enum ErrorCode {
     INVALID_EMAIL(1009, "Invalid email address", HttpStatus.BAD_REQUEST),
     EMAIL_IS_REQUIRED(1009, "Email is required", HttpStatus.BAD_REQUEST),
     INCORRECT_PASSWORD(1010, "Incorrect password", HttpStatus.BAD_REQUEST),
+    INVALID_VALUE_LIGHT(1011, "Invalid value for light. Only 0 (OFF) or 1 (ON) are accepted", HttpStatus.BAD_REQUEST),
+    INVALID_VALUE_FAN_OR_MINLIGHT(1012, "Invalid value for fan or minLight. Only values 0-100 are accepted", HttpStatus.BAD_REQUEST),
+    INVALID_FEED_KEY(1013, "Unknown feed key", HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

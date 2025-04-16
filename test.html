@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sensor Data Dashboard</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+        }
+
+        .sensor-card {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        .sensor-card h3 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .sensor-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        #status {
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+    </style>
+    <!-- Include SockJS client library -->
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.6.1/dist/sockjs.min.js"></script>
+    <!-- Include StompJS client library (ensure version compatibility if needed) -->
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.0.0/bundles/stomp.umd.min.js"></script>
+</head>
+
+<body>
+
+    <h1>YoloHome Sensor Data</h1>
+
+    <div id="status">Connecting...</div>
+
+    <div class="sensor-card">
+        <h3>Humidity (%)</h3>
+        <div id="humidity-value" class="sensor-value">--</div>
+    </div>
+
+    <div class="sensor-card">
+        <h3>Light Sensor</h3>
+        <div id="light-value" class="sensor-value">--</div>
+    </div>
+
+    <div class="sensor-card">
+        <h3>Temperature (°C)</h3>
+        <div id="temp-value" class="sensor-value">--</div>
+    </div>
+
+    <script>
+        let stompClient = null;
+        // Adjust hostname/port if your Spring Boot app runs elsewhere
+        // IMPORTANT: Include the context-path '/yolohome'
+        const serverUrl = 'http://localhost:8080/yolohome/adafruit-ws';
+        const sensorDataTopic = '/topic/sensor-data';
+
+        const statusDisplay = document.getElementById('status');
+        const humidityDisplay = document.getElementById('humidity-value');
+        const lightDisplay = document.getElementById('light-value');
+        const tempDisplay = document.getElementById('temp-value');
+
+        function connect() {
+            console.log("Attempting to connect to WebSocket:", serverUrl);
+            statusDisplay.textContent = 'Connecting...';
+            statusDisplay.style.color = 'orange';
+
+            // Use SockJS as the transport
+            const socket = new SockJS(serverUrl);
+            // Create a STOMP client over the SockJS transport
+            // Note: For stompjs v7+, use Stomp.over(socket)
+            // For older versions (like stomp.min.js often found), it might be Stomp.over(socket)
+            // Check the specific library version you are using if issues arise.
+            // The CDN link above is for v7.
+            stompClient = window.StompJs.Stomp.over(socket);
+            // Disable debug logging in production if desired
+            // stompClient.debug = (str) => {
+            //     console.log("STOMP DEBUG: " + str);
+            // };
+
+            const headers = {}; // No specific headers needed for connection here
+
+            stompClient.connect(headers, onConnected, onError);
+        }
+
+        function onConnected() {
+            console.log('WebSocket Connected!');
+            statusDisplay.textContent = 'Connected';
+            statusDisplay.style.color = 'green';
+
+            // Subscribe to the specific topic
+            stompClient.subscribe(sensorDataTopic, onMessageReceived);
+            console.log("Subscribed to:", sensorDataTopic);
+        }
+
+        function onError(error) {
+            console.error('Could not connect to WebSocket server.', error);
+            statusDisplay.textContent = 'Connection Error. Check console or if server is running.';
+            statusDisplay.style.color = 'red';
+            // Optional: Try to reconnect after a delay
+            // setTimeout(connect, 5000);
+        }
+
+        function onMessageReceived(payload) {
+            console.log('Message received:', payload.body);
+            try {
+                const message = JSON.parse(payload.body);
+                const sensorType = message.sensor;
+                const sensorValueRawJson = message.value; // This is the JSON string from Adafruit
+
+                // Parse the nested JSON string from Adafruit
+                const adafruitData = JSON.parse(sensorValueRawJson);
+                const actualValue = adafruitData.value; // Extract the actual sensor reading
+
+                console.log(`Parsed Data - Sensor: ${sensorType}, Value: ${actualValue}`);
+
+                switch (sensorType) {
+                    case 'humidity':
+                        humidityDisplay.textContent = actualValue;
+                        break;
+                    case 'light-sensor':
+                        lightDisplay.textContent = actualValue;
+                        break;
+                    case 'temp':
+                        tempDisplay.textContent = actualValue;
+                        break;
+                    default:
+                        console.warn("Received data for unknown sensor:", sensorType);
+                }
+            } catch (e) {
+                console.error("Error parsing received message:", e, "\nRaw payload:", payload.body);
+            }
+        }
+
+        // --- Initial Connection ---
+        connect();
+
+        // Optional: Add a disconnect function if you need a button to disconnect
+        function disconnect() {
+            if (stompClient !== null) {
+                stompClient.disconnect(() => {
+                    console.log("Disconnected");
+                    statusDisplay.textContent = 'Disconnected';
+                    statusDisplay.style.color = 'grey';
+                    // Clear sensor values on disconnect
+                    humidityDisplay.textContent = '--';
+                    lightDisplay.textContent = '--';
+                    tempDisplay.textContent = '--';
+                });
+                stompClient = null; // Clear the client object
+            }
+        }
+
+        // Example: You could call disconnect() when the window is closed
+        // window.addEventListener('beforeunload', disconnect);
+
+    </script>
+
+</body>
+
+</html>

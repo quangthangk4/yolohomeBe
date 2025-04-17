@@ -1,0 +1,287 @@
+{
+	"info": {
+		"_postman_id": "710fcd6e-1c58-4cfb-bbae-c408295ae66f",
+		"name": "DADN",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "39975817"
+	},
+	"item": [
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Create User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"thang\",\r\n  \"password\": \"123456\",\r\n  \"email\": \"thang@gmail.com\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/yolohome/users/registration",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"yolohome",
+								"users",
+								"registration"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"thang@gmail.com\",\r\n  \"password\": \"123456\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/yolohome/users/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"yolohome",
+								"users",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Adafruit",
+			"item": [
+				{
+					"name": "light control",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/yolohome/adafruit/light?value=1&username=thang",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"yolohome",
+								"adafruit",
+								"light"
+							],
+							"query": [
+								{
+									"key": "value",
+									"value": "1"
+								},
+								{
+									"key": "username",
+									"value": "thang"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "fan control",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/yolohome/adafruit/fan?value=50&username=thang",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"yolohome",
+								"adafruit",
+								"fan"
+							],
+							"query": [
+								{
+									"key": "value",
+									"value": "50"
+								},
+								{
+									"key": "username",
+									"value": "thang"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "minLight control",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"value\": \"0\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/yolohome/adafruit/minlight?value=80&username=thang",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"yolohome",
+								"adafruit",
+								"minlight"
+							],
+							"query": [
+								{
+									"key": "value",
+									"value": "80"
+								},
+								{
+									"key": "username",
+									"value": "thang"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "history",
+			"item": [
+				{
+					"name": "get historys",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/yolohome/history",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"yolohome",
+								"history"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "light",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-AIO-Key",
+						"value": "aio_jvQb53ZPivJuaGMfR4Ou1uk0pEXv",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"value\": \"0\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://io.adafruit.com/api/v2/quangthanga123/feeds/light/data",
+					"protocol": "https",
+					"host": [
+						"io",
+						"adafruit",
+						"com"
+					],
+					"path": [
+						"api",
+						"v2",
+						"quangthanga123",
+						"feeds",
+						"light",
+						"data"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "fan",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-AIO-Key",
+						"value": "aio_jvQb53ZPivJuaGMfR4Ou1uk0pEXv",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"value\": \"0\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://io.adafruit.com/api/v2/quangthanga123/feeds/fan/data",
+					"protocol": "https",
+					"host": [
+						"io",
+						"adafruit",
+						"com"
+					],
+					"path": [
+						"api",
+						"v2",
+						"quangthanga123",
+						"feeds",
+						"fan",
+						"data"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

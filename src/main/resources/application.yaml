@@ -14,7 +14,7 @@ spring:
 app:
   adafruit:
     username: quangthanga123
-    active_key:
+#    active_key:
 
 logging:
   level:

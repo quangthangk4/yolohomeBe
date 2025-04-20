@@ -1,6 +1,7 @@
 package com.DADN.homeyolo.controller;
 
 import com.DADN.homeyolo.dto.ApiResponse;
+import com.DADN.homeyolo.dto.response.DataAdafruitResponse;
 import com.DADN.homeyolo.service.AdafruitService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +31,13 @@ public class AdafruitController {
 
         return ApiResponse.<String>builder()
                 .message(message)
+                .build();
+    }
+
+    @GetMapping("/data")
+    public ApiResponse<DataAdafruitResponse> getData() {
+        return ApiResponse.<DataAdafruitResponse>builder()
+                .result(adafruitService.getLatestLightValue())
                 .build();
     }
 }

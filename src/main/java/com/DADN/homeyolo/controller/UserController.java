@@ -26,9 +26,11 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ApiResponse<Boolean> login(@RequestBody UserLoginRequest request) {
-        return ApiResponse.<Boolean>builder()
+    public ApiResponse<UserResponse> login(@RequestBody UserLoginRequest request) {
+        return ApiResponse.<UserResponse>builder()
                 .result(userService.login(request))
                 .build();
     }
+
+
 }

@@ -4,7 +4,6 @@ services:
     image: mongo:8.0.8-noble
     container_name: mongodb-yolohome
     hostname: mongodb
-    restart: always
     ports:
       - '27018:27017'
     environment:

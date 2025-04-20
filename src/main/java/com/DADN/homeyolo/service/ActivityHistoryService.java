@@ -7,6 +7,7 @@ import com.DADN.homeyolo.repository.ActivityHistoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,7 +20,9 @@ public class ActivityHistoryService {
 
     public List<ActivityHistoryResponse> activityHistory(){
         List<ActivityHistory> listHistory = activityHistoryRepository.findAll();
-        return listHistory.stream().map(activityHistoryMapper::toActivityHistoryResponse)
+        return listHistory.stream()
+                .sorted(Comparator.comparing(ActivityHistory::getTime).reversed())
+                .map(activityHistoryMapper::toActivityHistoryResponse)
                 .collect(Collectors.toList());
     }
 }

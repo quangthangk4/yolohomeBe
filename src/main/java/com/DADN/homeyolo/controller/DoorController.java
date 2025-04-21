@@ -2,6 +2,7 @@ package com.DADN.homeyolo.controller;
 
 import com.DADN.homeyolo.dto.ApiResponse;
 import com.DADN.homeyolo.dto.request.DoorCreatePasswordRequest;
+import com.DADN.homeyolo.service.AdafruitService;
 import com.DADN.homeyolo.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 public class DoorController {
 
     private final UserService userService;
+    private final AdafruitService adafruitService;
 
     @PostMapping("/create-password")
     public ApiResponse<Void> createPasswordDoor(@RequestBody DoorCreatePasswordRequest request) {
@@ -53,4 +55,5 @@ public class DoorController {
                 .result(status)
                 .build();
     }
+
 }

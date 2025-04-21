@@ -1,11 +1,13 @@
 package com.DADN.homeyolo.service;
 
 import com.DADN.homeyolo.dto.response.DataAdafruitResponse;
+import com.DADN.homeyolo.dto.response.TempChartResponse;
 import com.DADN.homeyolo.entity.ActivityHistory;
 import com.DADN.homeyolo.exception.AppException;
 import com.DADN.homeyolo.exception.ErrorCode;
 import com.DADN.homeyolo.repository.ActivityHistoryRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,6 +20,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +49,8 @@ public class AdafruitService {
 
         messagesHistory = new HashMap<>();
         messagesHistory.put("fan", "Fan speed adjusted to ");
+        messagesHistory.put("temp-danger", "dangerous temperature adjusted to ");
+        messagesHistory.put("humidity-danger", "dangerous humidity adjusted to ");
         messagesHistory.put("minlight", "minLight adjusted to ");
         messagesHistory.put("light", "Light turned ");
         this.activityHistoryRepository = activityHistoryRepository;
@@ -64,6 +69,8 @@ public class AdafruitService {
                     break;
                 case "minlight":
                 case "fan":
+                case "temp-danger":
+                case "humidity-danger":
                     int intValue = Integer.parseInt(value);
                     if (intValue < 0 || intValue > 100) {
                         throw new AppException(ErrorCode.INVALID_VALUE_FAN_OR_MINLIGHT);
@@ -105,7 +112,9 @@ public class AdafruitService {
                 "isOn", "light",
                 "minLight", "minlight",
                 "brightness", "light-sensor",
-                "fan", "fan"
+                "fan", "fan",
+                "humidity-danger", "humidity-danger",
+                "temp-danger", "temp-danger"
         );
 
         listUrl.forEach((sensorType, feedKey) -> {
@@ -129,6 +138,12 @@ public class AdafruitService {
                                 break;
                             case "fan":
                                 response.setFanSpeed(value);
+                                break;
+                            case "temp-danger":
+                                response.setTempDanger(value);
+                                break;
+                            case "humidity-danger":
+                                response.setHumidityDanger(value);
                                 break;
                         }
 
@@ -204,6 +219,55 @@ public class AdafruitService {
                     .subscribe();
         });
         log.info("✅ Hoàn tất fetch dữ liệu.");
+    }
+
+    public List<TempChartResponse> tempChart(String hours, String key_feed) {
+        String url = String.format("https://io.adafruit.com/api/v2/%s/feeds/%s/data/chart?hours=%s", username,key_feed, hours);
+
+        String jsonData = webClient.get()
+                .uri(url)
+                .header("X-AIO-Key", active_key)
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+
+        if (jsonData == null) {
+            System.err.println("Không nhận được dữ liệu từ Adafruit API.");
+            throw new AppException(ErrorCode.ERROR_WHEN_CALL_ADAFRUIT_API);
+        }
+
+
+        try {
+            JsonNode rootNode = objectMapper.readTree(jsonData);
+            // Lấy ra node "data"
+            JsonNode dataNode = rootNode.path("data"); // dùng path để tránh NullPointerException
+            if (dataNode.isMissingNode() || !dataNode.isArray()) {
+                System.err.println("Trường 'data' không tồn tại hoặc không phải là mảng trong JSON response.");
+                throw new AppException(ErrorCode.ERROR_WHEN_CALL_ADAFRUIT_API);
+            }
+
+            List<TempChartResponse> results = new ArrayList<>();
+            // Duyệt qua từng phần tử trong mảng "data"
+            for (JsonNode pointNode : dataNode) {
+                if (pointNode.isArray() && pointNode.size() >= 2) {
+                    String dateStr = pointNode.get(0).asText(null); // Lấy phần tử đầu tiên
+                    String valueStr = pointNode.get(1).asText(null); // Lấy phần tử thứ hai
+
+                    if (dateStr != null && valueStr != null) {
+                        results.add(new TempChartResponse(dateStr, valueStr));
+                    } else {
+                        System.err.println("Bỏ qua điểm dữ liệu không hợp lệ (null date hoặc value): " + pointNode.toString());
+                    }
+                } else {
+                    System.err.println("Bỏ qua điểm dữ liệu không hợp lệ (không phải mảng hoặc size < 2): " + pointNode.toString());
+                }
+            }
+            return results;
+
+        } catch (IOException e) {
+            System.err.println("Lỗi khi parse JSON từ Adafruit API: " + e.getMessage());
+            throw new AppException(ErrorCode.ERROR_WHEN_CALL_ADAFRUIT_API);
+        }
     }
 
 

@@ -14,4 +14,6 @@ public class DataAdafruitResponse {
     private String minLight;
     private String brightness;
     private String fanSpeed;
+    private String tempDanger;
+    private String humidityDanger;
 }

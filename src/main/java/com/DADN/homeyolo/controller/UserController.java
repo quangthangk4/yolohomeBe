@@ -7,10 +7,9 @@ import com.DADN.homeyolo.dto.response.UserResponse;
 import com.DADN.homeyolo.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -29,6 +28,13 @@ public class UserController {
     public ApiResponse<UserResponse> login(@RequestBody UserLoginRequest request) {
         return ApiResponse.<UserResponse>builder()
                 .result(userService.login(request))
+                .build();
+    }
+
+    @GetMapping
+    public ApiResponse<List<UserResponse>> getAllUsers() {
+        return ApiResponse.<List<UserResponse>>builder()
+                .result(userService.getAllUsers())
                 .build();
     }
 

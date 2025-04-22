@@ -2,6 +2,7 @@ package com.DADN.homeyolo.controller;
 
 import com.DADN.homeyolo.dto.ApiResponse;
 import com.DADN.homeyolo.dto.request.DoorCreatePasswordRequest;
+import com.DADN.homeyolo.dto.request.UpdateDoorPasswordRequest;
 import com.DADN.homeyolo.service.AdafruitService;
 import com.DADN.homeyolo.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,7 @@ public class DoorController {
     }
 
     @PutMapping("/update-password")
-    public ApiResponse<Void> updatePasswordDoor(@RequestBody DoorCreatePasswordRequest request) {
+    public ApiResponse<Void> updatePasswordDoor(@RequestBody UpdateDoorPasswordRequest request) {
         userService.ChangePasswordDoor(request);
         return ApiResponse.<Void>builder()
                 .message("Door password has been updated successfully")

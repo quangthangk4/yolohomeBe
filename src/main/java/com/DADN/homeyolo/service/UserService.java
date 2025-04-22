@@ -1,6 +1,7 @@
 package com.DADN.homeyolo.service;
 
 import com.DADN.homeyolo.dto.request.DoorCreatePasswordRequest;
+import com.DADN.homeyolo.dto.request.UpdateDoorPasswordRequest;
 import com.DADN.homeyolo.dto.request.UserCreationRequest;
 import com.DADN.homeyolo.dto.request.UserLoginRequest;
 import com.DADN.homeyolo.dto.response.UserResponse;
@@ -17,6 +18,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -44,6 +47,10 @@ public class UserService {
         return userMapper.toUserResponse(user);
     }
 
+    public List<UserResponse> getAllUsers() {
+        List<User> users = userRepository.findAll();
+        return users.stream().map(userMapper::toUserResponse).collect(Collectors.toList());
+    }
 
     public UserResponse login(UserLoginRequest request){
         User user = userRepository.findUserByEmail(request.getEmail()).orElseThrow(
@@ -84,12 +91,14 @@ public class UserService {
         doorRepository.save(door);
     }
 
-    public void ChangePasswordDoor(DoorCreatePasswordRequest request){
-        if (request.getPassword().isEmpty()) throw new AppException(ErrorCode.EMPTY_PASSWORD);
+    public void ChangePasswordDoor(UpdateDoorPasswordRequest request){
+        if (request.getNewPassword().isEmpty() || request.getCurrentPassword().isEmpty()) throw new AppException(ErrorCode.EMPTY_FIELD);
         Door door = doorRepository.findById(doorId).orElseThrow(
                 () -> new AppException(ErrorCode.DOOR_NOT_EXISTED)
         );
-        door.setPassword(passwordEncoder.encode(request.getPassword()));
+        boolean matches = passwordEncoder.matches(request.getCurrentPassword(), door.getPassword());
+        if(!matches) throw new AppException(ErrorCode.INCORRECT_PASSWORD);
+        door.setPassword(passwordEncoder.encode(request.getNewPassword()));
         doorRepository.save(door);
     }
 

@@ -26,6 +26,7 @@ public enum ErrorCode {
     ERROR_WHEN_CALL_ADAFRUIT_API(1016, "Error when calling Adafruit API", HttpStatus.INTERNAL_SERVER_ERROR),
     EMPTY_PASSWORD(1017, "Password is required", HttpStatus.BAD_REQUEST),
     DOOR_NOT_EXISTED(1018, "Door not existed", HttpStatus.NOT_FOUND),
+    EMPTY_FIELD(1019, "Empty field", HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

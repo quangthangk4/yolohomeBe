@@ -34,7 +34,7 @@ public class DoorController {
 
     @PostMapping("/unlock")
     public ApiResponse<Void> unlockDoor(@RequestBody DoorCreatePasswordRequest request) {
-        userService.unlockDoor(request.getPassword());
+        adafruitService.unlockDoor(request.getPassword());
         return ApiResponse.<Void>builder()
                 .message("Door has been unlocked successfully")
                 .build();

@@ -3,9 +3,11 @@ package com.DADN.homeyolo.service;
 import com.DADN.homeyolo.dto.response.DataAdafruitResponse;
 import com.DADN.homeyolo.dto.response.TempChartResponse;
 import com.DADN.homeyolo.entity.ActivityHistory;
+import com.DADN.homeyolo.entity.Door;
 import com.DADN.homeyolo.exception.AppException;
 import com.DADN.homeyolo.exception.ErrorCode;
 import com.DADN.homeyolo.repository.ActivityHistoryRepository;
+import com.DADN.homeyolo.repository.DoorRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,7 +16,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.IOException;
@@ -32,6 +36,8 @@ public class AdafruitService {
     private final Map<String, String> messagesHistory;
     private final ActivityHistoryRepository activityHistoryRepository;
     private final ObjectMapper objectMapper;
+    private final DoorRepository doorRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Value("${app.adafruit.username}")
     private String username;
@@ -42,8 +48,10 @@ public class AdafruitService {
     private final WebClient webClient;
     private final SimpMessagingTemplate messagingTemplate;
     private final Duration blockTimeout = Duration.ofSeconds(10);
+    private final String doorId = "6804b5e1f0c66f0b7e9ff70d";
 
-    public AdafruitService(WebClient.Builder webClientBuilder, SimpMessagingTemplate messagingTemplate, ActivityHistoryRepository activityHistoryRepository, ObjectMapper objectMapper) {
+
+    public AdafruitService(WebClient.Builder webClientBuilder, SimpMessagingTemplate messagingTemplate, ActivityHistoryRepository activityHistoryRepository, ObjectMapper objectMapper, DoorRepository doorRepository, PasswordEncoder passwordEncoder) {
         this.webClient = webClientBuilder.build();
         this.messagingTemplate = messagingTemplate;
 
@@ -55,6 +63,30 @@ public class AdafruitService {
         messagesHistory.put("light", "Light turned ");
         this.activityHistoryRepository = activityHistoryRepository;
         this.objectMapper = objectMapper;
+        this.doorRepository = doorRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    @Transactional
+    public void unlockDoor(String password){
+        Door door = doorRepository.findById(doorId).orElseThrow(
+                () -> new AppException(ErrorCode.DOOR_NOT_EXISTED)
+        );
+        if(!passwordEncoder.matches(password, door.getPassword())){
+            throw new AppException(ErrorCode.INCORRECT_PASSWORD);
+        }
+        door.setUnlock(true);
+        doorRepository.save(door);
+        String url = String.format("https://io.adafruit.com/api/v2/%s/feeds/%s/data", username, "passwordinput");
+
+        webClient.post()
+                .uri(url)
+                .header("X-AIO-Key", active_key)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(Map.of("value", password))
+                .retrieve()
+                .toBodilessEntity()
+                .subscribe();
     }
 
     public void sendControlCommand(String feedKey, String value, String username) {

@@ -72,16 +72,7 @@ public class UserService {
                 .build());
     }
 
-    public void unlockDoor(String password){
-        Door door = doorRepository.findById(doorId).orElseThrow(
-                () -> new AppException(ErrorCode.DOOR_NOT_EXISTED)
-        );
-        if(!passwordEncoder.matches(password, door.getPassword())){
-            throw new AppException(ErrorCode.INCORRECT_PASSWORD);
-        }
-        door.setUnlock(true);
-        doorRepository.save(door);
-    }
+
 
     public void lockDoor(){
         Door door = doorRepository.findById(doorId).orElseThrow(
